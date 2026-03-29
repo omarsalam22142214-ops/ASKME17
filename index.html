@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي البزر - اختار أقسامك</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+        body {
+            background-color: #121026;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* التعديل ده عشان الفوتر ينزل تحت اللعبة */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #1a1835;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 1px solid #2a2752;
+            text-align: center;
+        }
+        h1, h2 { color: #f9a826; }
+        
+        #setup-screen, #category-screen, #game-screen, #winner-screen { display: none; }
+        #setup-screen.active, #category-screen.active, #game-screen.active, #winner-screen.active { display: block; }
+        
+        .input-group { margin-bottom: 15px; display: flex; gap: 10px; }
+        input[type="text"], select {
+            flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 1rem;
+            background-color: #2a2752; color: white; outline: none;
+        }
+        .btn {
+            background-color: #e94560; color: white; border: none; padding: 12px 20px;
+            font-size: 1.1rem; font-weight: bold; border-radius: 10px; cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover { background-color: #d83a56; transform: scale(1.05); }
+        .btn-full { width: 100%; margin-top: 15px; background-color: #f9a826; color: #121026; }
+        .btn-full:hover { background-color: #e69515; }
+        
+        .players-list { list-style: none; padding: 0; margin: 15px 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .player-badge { background-color: #2a2752; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        
+        /* شاشة الأقسام وتأثير التحديد */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .cat-card {
+            background-color: #2a2752;
+            border-radius: 15px;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid transparent;
+        }
+        .cat-card:hover { transform: translateY(-5px); background-color: #353163; }
+        
+        .cat-card.selected {
+            border-color: #4caf50;
+            background-color: #1f3b2b; 
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+            transform: scale(1.03);
+        }
+        
+        .cat-icon { font-size: 3rem; margin-bottom: 10px; }
+        .cat-title { font-size: 1rem; font-weight: bold; color: #ddd; }
+        
+        /* شاشة اللعب */
+        .scoreboard {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+            background-color: #2a2752; padding: 15px; border-radius: 10px; margin-bottom: 20px;
+        }
+        .score-card { background-color: #121026; padding: 10px; border-radius: 8px; min-width: 80px; font-weight: bold; border: 1px solid transparent; }
+        .active-player-card { border-color: #4caf50; background-color: #1e2a38; }
+        
+        .turn-box { background-color: #f9a826; color: #121026; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold; }
+        .question-text { font-size: 1.6rem; margin-bottom: 15px; line-height: 1.5; }
+        
+        .answer-box {
+            background-color: #1e2a38;
+            border-right: 5px solid #4caf50;
+            padding: 15px; margin-bottom: 25px; border-radius: 5px;
+            font-size: 1.3rem; color: #4caf50; font-weight: bold;
+        }
+        
+        .judge-controls { display: flex; gap: 15px; margin-bottom: 10px; }
+        .btn-correct { background-color: #4caf50; flex: 1; padding: 15px; font-size: 1.2rem; border-radius: 10px; }
+        .btn-wrong { background-color: #f44336; flex: 1; padding: 15px; font-size: 1.2rem; border-radius: 10px;}
+        
+        /* زرار التخطي الجديد */
+        .btn-skip { 
+            background-color: #4b5563; 
+            width: 100%; 
+            padding: 12px; 
+            font-size: 1.1rem; 
+            border-radius: 10px; 
+            color: #d1d5db; 
+            transition: 0.3s;
+        }
+        .btn-skip:hover { background-color: #6b7280; color: white; }
+
+        .winner-text { font-size: 2.5rem; color: #4caf50; margin: 20px 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        
+        /* تنسيق الفوتر */
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #aaa;
+        }
+        footer p {
+            margin: 5px 0;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #121026; }
+        ::-webkit-scrollbar-thumb { background: #2a2752; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="setup-screen" class="active">
+            <h1>🎮 تحديات عمارة 17</h1>
+            <p>سجل أسامي اللعيبة وحدد الدستة!</p>
+            
+            <div class="input-group">
+                <input type="text" id="player-input" placeholder="اكتب اسم اللاعب...">
+                <button class="btn" onclick="addPlayer()">إضافة</button>
+            </div>
+            
+            <ul class="players-list" id="players-ul"></ul>
+            
+            <div class="input-group" style="margin-top: 20px;">
+                <label style="align-self: center; font-weight: bold;">العب لحد:</label>
+                <select id="target-score">
+                    <option value="10">10 نقط</option>
+                    <option value="20">20 نقطة</option>
+                    <option value="30">30 نقطة</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-full" onclick="goToCategories()">التالي: اختيار الأقسام ➡️</button>
+        </div>
+
+        <div id="category-screen">
+            <h2 style="margin-bottom: 5px;">Select Categories</h2>
+            <p style="color: #aaa; font-size: 0.9rem; margin-top: 0;">تقدر تحدد أكتر من قسم مع بعض</p>
+            
+            <div class="categories-grid" id="categories-container"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" style="background-color: #555; flex: 1;" onclick="goBackToSetup()">⬅️ رجوع</button>
+                <button class="btn" style="background-color: #4caf50; flex: 2;" onclick="startSelectedCategories()">ابدأ اللعب 🚀</button>
+            </div>
+        </div>
+
+        <div id="game-screen">
+            <h3 id="current-category-title" style="color: #aaa; margin-top: 0;">الأقسام: ...</h3>
+            <div class="scoreboard" id="scoreboard"></div>
+            
+            <div class="turn-box" id="turn-display">🎤 الدور على: ...</div>
+            <div class="question-text" id="question-text">جاري تحميل السؤال...</div>
+            
+            <div class="answer-box">
+                الإجابة: <span id="answer-text">...</span>
+            </div>
+            
+            <div class="judge-controls">
+                <button class="btn btn-wrong" onclick="judgeAnswer(false)">غلط -1 ❌</button>
+                <button class="btn btn-correct" onclick="judgeAnswer(true)">صح +1 ✅</button>
+            </div>
+            <button class="btn btn-skip" onclick="skipQuestion()">تخطي السؤال ⏭️</button>
+        </div>
+
+        <div id="winner-screen">
+            <h1>🏆 الفايز بالدستة 🏆</h1>
+            <div class="winner-text" id="winner-name">اسم الفايز</div>
+            <button class="btn btn-full" onclick="location.reload()">العب من تاني 🔄</button>
+        </div>
+
+    </div>
+
+    <footer>
+        <p style="font-size: 22px; font-weight: bold;">© 2027 _ 2026 ENG OMAR. All Rights Reserved.</p>
+        <p>اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى سَيِّدِنَا مُحَمَّدٍ ﷺ</p>
+    </footer>
+
+    <script>
+        const questionsDB = {
+            "معلومات عامة": {
+                icon: "🧠",
+                questions: [
+                    { q: "ما هو أطول نهر في العالم؟", a: "نهر النيل" },
+                    { q: "كم عدد قارات العالم؟", a: "7 قارات" },
+                    { q: "ما هو الحيوان الذي يُسمى بسفينة الصحراء؟", a: "الجمل" },
+                    { q: "ما هو الكوكب الملقب بالكوكب الأحمر؟", a: "المريخ" }
+                ]
+            },
+            "أفلام وأغاني": {
+                icon: "🎬",
+                questions: [
+                    { q: "فيلم البطل فيه اسمه 'صلاح' وقال جملة 'الدين المعاملة'؟", a: "الإرهاب والكباب" },
+                    { q: "أغنية 'يا بتاع النعناع' غناء مين؟", a: "مصطفى حجاج" },
+                    { q: "من هو بطل فيلم 'الجزيرة'؟", a: "أحمد السقا" }
+                ]
+            },
+            "مسلسلات": {
+                icon: "📺",
+                questions: [
+                    { q: "مسلسل بطولته 'عبد الغفور البرعي'؟", a: "لن أعيش في جلباب أبي" },
+                    { q: "مسلسل رمضاني بطولته 'رفاعي الدسوقي'؟", a: "الأسطورة" },
+                    { q: "اسم المستشفى في مسلسل 'بالطو'؟", a: "طرشوخ الليف" }
+                ]
+            },
+            "رياضة": {
+                icon: "⚽",
+                questions: [
+                    { q: "من هو الهداف التاريخي لمنتخب مصر؟", a: "حسام حسن" },
+                    { q: "أكثر نادي تتويجاً بدوري أبطال أوروبا؟", a: "ريال مدريد" },
+                    { q: "في أي عام تم تأسيس النادي الأهلي المصري؟", a: "1907" }
+                ]
+            },
+            "أفلام إيموجي": {
+                icon: "🦁",
+                questions: [
+                    { q: "خمن الفيلم من الإيموجي: 🦁👑", a: "الأسد الملك (The Lion King)" },
+                    { q: "خمن الفيلم من الإيموجي: 🚢🧊💑", a: "تيتانيك (Titanic)" },
+                    { q: "خمن الفيلم من الإيموجي: 🕷️👨", a: "سبايدر مان (Spider-Man)" }
+                ]
+            },
+            "ديني إسلامي": {
+                icon: "🕋",
+                questions: [
+                    { q: "ما هي السورة التي تُسمى بقلب القرآن؟", a: "سورة يس" },
+                    { q: "ما هي أول غزوة في الإسلام؟", a: "غزوة الأبواء" },
+                    { q: "من هو الصحابي الملقب بـ 'سيف الله المسلول'؟", a: "خالد بن الوليد" }
+                ]
+            }
+        };
+
+        let activeQuestions = []; 
+        let players = [];
+        let targetScore = 10;
+        let currentPlayerIndex = 0;
+        let selectedCategories = []; 
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.container > div').forEach(el => el.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function addPlayer() {
+            const input = document.getElementById("player-input");
+            const name = input.value.trim();
+            if (name !== "") {
+                players.push({ name: name, score: 0 });
+                updatePlayersList();
+                input.value = "";
+            }
+        }
+
+        function updatePlayersList() {
+            const ul = document.getElementById("players-ul");
+            ul.innerHTML = "";
+            players.forEach(player => {
+                const li = document.createElement("li");
+                li.className = "player-badge";
+                li.innerText = player.name;
+                ul.appendChild(li);
+            });
+        }
+
+        function goToCategories() {
+            if (players.length < 2) {
+                alert("لازم تسجل على الأقل 2 لعيبة!");
+                return;
+            }
+            targetScore = parseInt(document.getElementById("target-score").value);
+            renderCategories();
+            switchScreen('category-screen');
+        }
+
+        function goBackToSetup() {
+            switchScreen('setup-screen');
+        }
+
+        function renderCategories() {
+            const container = document.getElementById("categories-container");
+            container.innerHTML = "";
+            
+            for (const category in questionsDB) {
+                const catData = questionsDB[category];
+                const card = document.createElement("div");
+                card.className = "cat-card";
+                
+                if (selectedCategories.includes(category)) {
+                    card.classList.add("selected");
+                }
+
+                card.innerHTML = `
+                    <div class="cat-icon">${catData.icon}</div>
+                    <div class="cat-title">${category}</div>
+                `;
+                
+                card.onclick = () => toggleCategory(category, card);
+                container.appendChild(card);
+            }
+        }
+
+        function toggleCategory(category, cardElement) {
+            const index = selectedCategories.indexOf(category);
+            if (index > -1) {
+                selectedCategories.splice(index, 1);
+                cardElement.classList.remove('selected');
+            } else {
+                selectedCategories.push(category);
+                cardElement.classList.add('selected');
+            }
+        }
+
+        function startSelectedCategories() {
+            if (selectedCategories.length === 0) {
+                alert("يا بطل اختار قسم واحد على الأقل عشان نلعب بيه!");
+                return;
+            }
+
+            activeQuestions = [];
+            selectedCategories.forEach(cat => {
+                activeQuestions = activeQuestions.concat(questionsDB[cat].questions);
+            });
+            
+            activeQuestions = activeQuestions.sort(() => Math.random() - 0.5);
+
+            document.getElementById("current-category-title").innerText = `الأقسام: ${selectedCategories.join("، ")}`;
+            
+            switchScreen('game-screen');
+            updateScoreboard();
+            loadNextQuestion();
+        }
+
+        function updateScoreboard() {
+            const board = document.getElementById("scoreboard");
+            board.innerHTML = "";
+            players.forEach((player, index) => {
+                const div = document.createElement("div");
+                div.className = index === currentPlayerIndex ? "score-card active-player-card" : "score-card";
+                div.innerHTML = `${player.name} <br><span style="color:#f9a826; font-size:1.2rem;">${player.score}</span>`;
+                board.appendChild(div);
+            });
+        }
+
+        function loadNextQuestion() {
+            if (activeQuestions.length === 0) {
+                selectedCategories.forEach(cat => {
+                    activeQuestions = activeQuestions.concat(questionsDB[cat].questions);
+                });
+                activeQuestions = activeQuestions.sort(() => Math.random() - 0.5);
+            }
+            
+            const currentQ = activeQuestions.pop(); 
+            updateScoreboard();
+            document.getElementById("turn-display").innerText = `🎤 الدور على: ${players[currentPlayerIndex].name}`;
+            document.getElementById("question-text").innerText = currentQ.q;
+            document.getElementById("answer-text").innerText = currentQ.a;
+        }
+
+        function judgeAnswer(isCorrect) {
+            if (isCorrect) {
+                players[currentPlayerIndex].score += 1;
+            } else {
+                players[currentPlayerIndex].score -= 1;
+            }
+
+            if (players[currentPlayerIndex].score >= targetScore) {
+                showWinner(players[currentPlayerIndex].name);
+            } else {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                loadNextQuestion();
+            }
+        }
+
+        function skipQuestion() {
+            loadNextQuestion();
+        }
+
+        function showWinner(winnerName) {
+            switchScreen('winner-screen');
+            document.getElementById("winner-name").innerText = winnerName;
+        }
+    </script>
+
+</body>
+</html>
