@@ -1,5 +1,4 @@
-<html lang="ar" dir="rtl">
-<head>
+<html lang="ar" dir="rtl"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحديات عمارة 17 - النسخة المصرية</title>
@@ -98,7 +97,7 @@
         ::-webkit-scrollbar-track { background: #121026; }
         ::-webkit-scrollbar-thumb { background: #2a2752; border-radius: 10px; }
     </style>
-</head>
+<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
 <body>
     <div id="toast" class="toast-msg"></div>
     <div class="container">
@@ -390,18 +389,35 @@
                 return;
             }
             const startBtn = document.getElementById("start-btn");
-            startBtn.innerText = "جاري التحميل... ⏳";
+            startBtn.innerText = "جاري سحب الأسئلة... ⏳";
             startBtn.disabled = true;
+            
             arabicQuestions = [];
             englishQuestions = [];
             
-            // 1. إضافة الأسئلة المحلية 
+            // 1. سحب الأسئلة الثابتة اللي في الكود
             selectedCategories.forEach(cat => {
                 if(unifiedCategories[cat].localAr) arabicQuestions = arabicQuestions.concat(unifiedCategories[cat].localAr);
                 if(unifiedCategories[cat].localEn) englishQuestions = englishQuestions.concat(unifiedCategories[cat].localEn);
             });
 
-            // 2. سحب أسئلة عشوائية من النت لكل الأقسام المختارة كخطة احتياطية
+            // 2. سحب الأسئلة الجديدة من Google Sheets (الـ API بتاعك) 🚀
+            try {
+                const sheetApiUrl = 'https://sheetdb.io/api/v1/fedbt2p5bnzp1'; 
+                const response = await fetch(sheetApiUrl);
+                const sheetData = await response.json();
+
+                // لو رجع بيانات من الشيت، هنضيفها لأسئلة اللعبة
+                if (sheetData && sheetData.length > 0) {
+                    arabicQuestions = arabicQuestions.concat(sheetData);
+                    showToast(`تم سحب ${sheetData.length} سؤال من جوجل شيت! 🤩`);
+                }
+            } catch (e) { 
+                console.error("مشكلة في سحب أسئلة الشيت:", e); 
+                showToast("النت ضعيف، هنلعب بالأسئلة الأساسية 📶");
+            }
+
+            // 3. سحب أسئلة أجنبية من OpenTDB كاحتياطي للترجمة
             for (const cat of selectedCategories) {
                 const apiId = unifiedCategories[cat].apiId;
                 if (apiId !== null) {
@@ -419,7 +435,7 @@
                 }
             }
 
-            // لخبطة الأسئلة بخوارزمية مظبوطة
+            // 4. لخبطة الأسئلة عشان متتكررش
             arabicQuestions = shuffleArray(arabicQuestions);
             englishQuestions = shuffleArray(englishQuestions);
             
@@ -579,5 +595,4 @@
             document.getElementById("winner-name").innerText = winnerName; 
         }
     </script>
-</body>
-</html>
+</body></html>
