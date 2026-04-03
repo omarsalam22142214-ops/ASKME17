@@ -1,4 +1,5 @@
-<html lang="ar" dir="rtl"><head>
+<html lang="ar" dir="rtl">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحديات عمارة 17 - النسخة المصرية</title>
@@ -99,15 +100,13 @@
     </style>
 </head>
 <body>
-
     <div id="toast" class="toast-msg"></div>
-
     <div class="container">
         <div id="setup-screen" class="active">
             <h1>🎮 تحديات عمارة 17</h1>
             <p>سجل أسامي اللعيبة وظبط إعدادات الماتش!</p>
             <div class="input-group">
-                <input type="text" id="player-input" placeholder="اكتب اسم اللاعب...">
+                <input type="text" id="player-input" placeholder="اكتب اسم اللاعب..." data-ddg-inputtype="unknown">
                 <button class="btn" onclick="addPlayer()">إضافة</button>
             </div>
             <ul class="players-list" id="players-ul"></ul>
@@ -128,7 +127,6 @@
             </div>
             <button class="btn btn-full" onclick="goToCategories()">التالي: اختيار الأقسام ➡️</button>
         </div>
-
         <div id="category-screen">
             <h2 style="margin-bottom: 5px;">Select Categories</h2>
             <p id="cat-desc" style="color: #aaa; font-size: 0.9rem; margin-top: 0;">الأقسام دي موحدة للعربي والإنجليزي</p>
@@ -138,7 +136,6 @@
                 <button class="btn" id="start-btn" style="background-color: #4caf50; flex: 2;" onclick="startSelectedCategories()">تحميل وبدء اللعب 🚀</button>
             </div>
         </div>
-
         <div id="game-screen">
             <h3 id="current-category-title" style="color: #aaa; margin-top: 0;">جاري اللعب...</h3>
             <div class="scoreboard" id="scoreboard"></div>
@@ -160,7 +157,6 @@
             <button class="btn btn-translate" id="translate-btn" onclick="translateCurrent()">ترجم للعربي 🌐</button>
             <button class="btn btn-skip" onclick="skipQuestion()">تخطي السؤال ⏭️</button>
         </div>
-
         <div id="winner-screen">
             <h1>🏆 الفايز بالدستة 🏆</h1>
             <div class="winner-text" id="winner-name">اسم الفايز</div>
@@ -168,21 +164,128 @@
         </div>
         <button onclick="window.open('https://omarsalam22142214-ops.github.io/-spyimposter/')" class="btn" style="width: 100%; margin-top: 15px; background-color: #3b82f6;"> الجاسوس ★</button>
     </div>
-
     <footer>
         <p style="font-size: 22px; font-weight: bold;">© 2026 - 2027 ENG OMAR . All Rights Reserved.</p>
         <p>اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى سَيِّدِنَا مُحَمَّدٍ ﷺ</p>
     </footer>
-
     <script>
         const unifiedCategories = {
-            "معلومات عامة": { icon: "🧠", apiId: 9, localAr: [{ q: "ما هو أطول نهر في العالم؟", a: "نهر النيل" }, { q: "ما هو الكوكب الملقب بالكوكب الأحمر؟", a: "المريخ" }, { q: "في أي محافظة يقع السد العالي؟", a: "أسوان" }, { q: "من هو صاحب نوبل في الأدب من مصر؟", a: "نجيب محفوظ" }, { q: "ما هي أكبر مدينة في أفريقيا والشرق الأوسط؟", a: "القاهرة" }, { q: "كم عدد محافظات مصر؟", a: "27 محافظة" }] },
-            "أفلام وسينما": { icon: "🎬", apiId: 11, localAr: [{ q: "فيلم البطل فيه اسمه 'صلاح' وقال جملة 'الدين المعاملة'؟", a: "الإرهاب والكباب" }, { q: "من هو الممثل الملقب بـ 'الزعيم'؟", a: "عادل إمام" }, { q: "فيلم 'الناظر' بطل شخصية اللمبي فيه هو الممثل؟", a: "محمد سعد" }, { q: "من هو بطل فيلم 'همام في أمستردام'؟", a: "محمد هنيدي" }, { q: "صاحب شخصية 'رفاعي الدسوقي' هو الممثل؟", a: "محمد رمضان" }] },
-            "أغاني وموسيقى": { icon: "🎵", apiId: 12, localAr: [{ q: "مطرب ملقب بـ 'الهضبة'؟", a: "عمرو دياب" }, { q: "صاحب أغنية 'تملي معاك'؟", a: "عمرو دياب" }, { q: "من هي 'كوكب الشرق'؟", a: "أم كلثوم" }] },
-            "تليفزيون ومسلسلات": { icon: "📺", apiId: 14, localAr: [{ q: "مسلسل بطولته 'عبد الغفور البرعي'؟", a: "لن أعيش في جلباب أبي" }, { q: "اسم المستشفى في مسلسل 'بالطو'؟", a: "طرشوخ الليف" }] },
-            "رياضة": { icon: "⚽", apiId: 21, localAr: [{ q: "مين الهداف التاريخي لمنتخب مصر؟", a: "حسام حسن" }, { q: "أكثر نادي مصري فاز ببطولة أفريقيا؟", a: "النادي الأهلي" }] },
-            "ديني إسلامي": { icon: "🕋", apiId: null, localAr: [{ q: "ما هي السورة التي تُسمى بقلب القرآن؟", a: "سورة يس" }, { q: "ما هي أول غزوة في الإسلام؟", a: "غزوة الأبواء" }], localEn: [{ q: "What is the holy month of fasting in Islam?", a: "Ramadan" }, { q: "How many pillars of Islam are there?", a: "Five (5)" }] },
-            "فوازير وألغاز": { icon: "🤔", apiId: null, localAr: [{ q: "شيء كلما زاد نقص، فما هو؟", a: "العمر" }, { q: "ما هو الشيء الذي لا يمشي إلا بالضرب؟", a: "المسمار" }], localEn: [{ q: "I have keys but open no doors. What am I?", a: "A piano" }, { q: "What has one eye, but can't see?", a: "A needle" }] }
+            "معلومات عامة": { 
+                icon: "🧠", apiId: 9, 
+                localAr: [
+                    { q: "ما هو أطول نهر في العالم؟", a: "نهر النيل" }, 
+                    { q: "ما هو الكوكب الملقب بالكوكب الأحمر؟", a: "المريخ" }, 
+                    { q: "في أي محافظة يقع السد العالي؟", a: "أسوان" }, 
+                    { q: "من هو صاحب نوبل في الأدب من مصر؟", a: "نجيب محفوظ" }, 
+                    { q: "ما هي أكبر مدينة في أفريقيا والشرق الأوسط؟", a: "القاهرة" }, 
+                    { q: "كم عدد محافظات مصر؟", a: "27 محافظة" },
+                    { q: "أكبر بحيرة صناعية في العالم موجودة في مصر، اسمها إيه؟", a: "بحيرة ناصر" },
+                    { q: "عاصمة مصر في عصر الدولة الحديثة الفراعونية كانت إيه؟", a: "طيبة (الأقصر حالياً)" },
+                    { q: "مين العالم المصري اللي أخد جايزة نوبل في الكيمياء؟", a: "أحمد زويل" },
+                    { q: "إيه هي المدينة المصرية اللي بتلقب بمدينة السحر والجمال؟", a: "شرم الشيخ" },
+                    { q: "حيوان بيسموه سفينة الصحراء، إيه هو؟", a: "الجمل" },
+                    { q: "أكلة مصرية شعبية مكونة من مكرونة ورز وعدس وصلصة؟", a: "الكشري" },
+                    { q: "أعلى قمة جبلية في مصر اسمها إيه؟", a: "جبل سانت كاترين" },
+                    { q: "مين الملك اللي بنى الهرم الأكبر؟", a: "الملك خوفو" }
+                ] 
+            },
+            "أفلام وسينما": { 
+                icon: "🎬", apiId: 11, 
+                localAr: [
+                    { q: "فيلم البطل فيه اسمه 'صلاح' وقال جملة 'الدين المعاملة'؟", a: "الإرهاب والكباب" }, 
+                    { q: "من هو الممثل الملقب بـ 'الزعيم'؟", a: "عادل إمام" }, 
+                    { q: "فيلم 'الناظر' بطل شخصية اللمبي فيه هو الممثل؟", a: "محمد سعد" }, 
+                    { q: "من هو بطل فيلم 'همام في أمستردام'؟", a: "محمد هنيدي" }, 
+                    { q: "صاحب شخصية 'رفاعي الدسوقي' هو الممثل؟", a: "محمد رمضان" },
+                    { q: "صاحب إفيه 'أنا لا أرى، أنا لا أسمع، أنا لا أتكلم' في مسرحية شاهد ما شفش حاجة؟", a: "عادل إمام" },
+                    { q: "فيلم لأحمد حلمي لعب فيه دور 3 إخوات توأم؟", a: "كده رضا" },
+                    { q: "إفيه 'يا ديني على الحلاوة' اتقال في فيلم إيه؟", a: "أبو علي (كريم عبد العزيز)" },
+                    { q: "مين الممثل اللي عمل شخصية 'حزلقوم'؟", a: "أحمد مكي" },
+                    { q: "فيلم رعب مصري شهير بطولة يسرا وأحمد عز؟", a: "التعويذة (أو كلام في الحب - الإجابة الأدق: فيلم التعويذة كان لنجوى فؤاد ومحمود ياسين، بس بتاع يسرا اسمه الإنس والجن)" },
+                    { q: "من هو النجم الملقب بـ 'الساحر' في السينما المصرية؟", a: "محمود عبد العزيز" },
+                    { q: "فيلم مصري كوميدي بطولته 'عاطف' و'محيي'؟", a: "فول الصين العظيم" },
+                    { q: "إفيه 'صلاة النبي أحسن' بتاع مين من الممثلين الكوميديين؟", a: "محمد سعد (اللمبي)" }
+                ] 
+            },
+            "أغاني وموسيقى": { 
+                icon: "🎵", apiId: 12, 
+                localAr: [
+                    { q: "مطرب ملقب بـ 'الهضبة'؟", a: "عمرو دياب" }, 
+                    { q: "صاحب أغنية 'تملي معاك'؟", a: "عمرو دياب" }, 
+                    { q: "من هي 'كوكب الشرق'؟", a: "أم كلثوم" },
+                    { q: "مطرب مصري ملقب بـ 'الكينج'؟", a: "محمد منير" },
+                    { q: "صاحب أغنية 'بنت الجيران' اللي كسرت الدنيا في المهرجانات؟", a: "حسن شاكوش وعمر كمال" },
+                    { q: "مطرب مصري قديم ملقب بـ 'العندليب الأسمر'؟", a: "عبد الحليم حافظ" },
+                    { q: "مطرب شاب ملقب بـ 'نجم الجيل'؟", a: "تامر حسني" },
+                    { q: "أغنية 'يا بتاع النعناع يا منعنع' غناها مين؟", a: "مصطفى حجاج" },
+                    { q: "مين الملحن والمطرب صاحب أغنية 'أنا بعشق البحر'؟", a: "محمد منير (أو نجاة الصغيرة غنتها الأول)" },
+                    { q: "فرقة غنائية مصرية مشهورة في التسعينات اسمها إيه؟", a: "فرقة المصريين / أو فرقة حسام حسني / الفور إم" }
+                ] 
+            },
+            "تليفزيون ومسلسلات": { 
+                icon: "📺", apiId: 14, 
+                localAr: [
+                    { q: "مسلسل بطولته 'عبد الغفور البرعي'؟", a: "لن أعيش في جلباب أبي" }, 
+                    { q: "اسم المستشفى في مسلسل 'بالطو'؟", a: "طرشوخ الليف" },
+                    { q: "مين الممثل اللي عمل شخصية 'مختار أبو المجد' في إمبراطورية ميم (المسلسل)؟", a: "خالد النبوي" },
+                    { q: "مسلسل رمضاني شهير جداً ليحيى الفخراني كان طالع فيه أب لكتير من الولاد؟", a: "يتربى في عزو" },
+                    { q: "شخصية 'فضة المعداوي' ظهرت في مسلسل إيه؟", a: "الراية البيضا" },
+                    { q: "مسلسل صعيدي شهير بطولة أحمد عبد العزيز (البدري بدار)؟", a: "ذئاب الجبل" },
+                    { q: "مسلسل كوميدي لأحمد مكي أجزاؤه عدت الـ 8 أجزاء؟", a: "الكبير أوي" },
+                    { q: "مين اللي عمل دور 'جعفر العمدة'؟", a: "محمد رمضان" }
+                ] 
+            },
+            "رياضة": { 
+                icon: "⚽", apiId: 21, 
+                localAr: [
+                    { q: "مين الهداف التاريخي لمنتخب مصر؟", a: "حسام حسن" }, 
+                    { q: "أكثر نادي مصري فاز ببطولة أفريقيا؟", a: "النادي الأهلي" },
+                    { q: "النادي الأهلي اتأسس سنة كام؟", a: "1907" },
+                    { q: "نادي الزمالك اتأسس سنة كام؟", a: "1911" },
+                    { q: "مين اللاعب المصري اللي كسب دوري أبطال أوروبا مع ليفربول؟", a: "محمد صلاح" },
+                    { q: "مين المعلق الرياضي صاحب إفيه 'يا نهار أبيض' و 'بيلو بيلو'؟", a: "مدحت شلبي" },
+                    { q: "منتخب مصر أخد كأس الأمم الأفريقية كام مرة؟", a: "7 مرات" },
+                    { q: "أكثر لاعب مصري شارك في مباريات دولية مع المنتخب؟", a: "أحمد حسن" },
+                    { q: "نادي مصري بيلقب بـ 'الدراويش'؟", a: "النادي الإسماعيلي" },
+                    { q: "نادي مصري بيلقب بـ 'سيد البلد'؟", a: "نادي الاتحاد السكندري" }
+                ] 
+            },
+            "ديني إسلامي": { 
+                icon: "🕋", apiId: null, 
+                localAr: [
+                    { q: "ما هي السورة التي تُسمى بقلب القرآن؟", a: "سورة يس" }, 
+                    { q: "ما هي أول غزوة في الإسلام؟", a: "غزوة الأبواء (أو ودّان)" },
+                    { q: "كم عدد سور القرآن الكريم؟", a: "114 سورة" },
+                    { q: "من هو أول الخلفاء الراشدين؟", a: "أبو بكر الصديق رضي الله عنه" },
+                    { q: "ما هي السورة التي تُسمى بعروس القرآن؟", a: "سورة الرحمن" },
+                    { q: "من هو الصحابي الملقب بسيف الله المسلول؟", a: "خالد بن الوليد" },
+                    { q: "ما هو الشهر الذي أنزل فيه القرآن؟", a: "شهر رمضان" },
+                    { q: "كم عدد أركان الإسلام؟", a: "5 أركان" }
+                ], 
+                localEn: [
+                    { q: "What is the holy month of fasting in Islam?", a: "Ramadan" }, 
+                    { q: "How many pillars of Islam are there?", a: "Five (5)" },
+                    { q: "Who is the last prophet in Islam?", a: "Prophet Muhammad (PBUH)" }
+                ] 
+            },
+            "فوازير وألغاز": { 
+                icon: "🤔", apiId: null, 
+                localAr: [
+                    { q: "شيء كلما زاد نقص، فما هو؟", a: "العمر" }, 
+                    { q: "ما هو الشيء الذي لا يمشي إلا بالضرب؟", a: "المسمار" },
+                    { q: "حاجة بتسمعك ومبتتكلمش، وبتشوفك ومبتبصش، إيه هي؟", a: "المراية (أو التليفون)" },
+                    { q: "إيه هو الباب اللي مستحيل يتفتح؟", a: "الباب المفتوح" },
+                    { q: "ابن أمك وابن أبوك، ومش أختك ومش أخوك.. يبقى مين؟", a: "أنت" },
+                    { q: "بيمشي من غير رجلين ويعيط من غير عينين.. إيه هو؟", a: "السحاب" },
+                    { q: "حاجة لونها أسود بس مش بتنور غير لما تولع فيها؟", a: "الفحم" },
+                    { q: "عنده أسنان كتير بس مابيعضش.. إيه هو؟", a: "المشط" }
+                ], 
+                localEn: [
+                    { q: "I have keys but open no doors. What am I?", a: "A piano" }, 
+                    { q: "What has one eye, but can't see?", a: "A needle" },
+                    { q: "What gets wetter as it dries?", a: "A towel" }
+                ] 
+            }
         };
 
         let arabicQuestions = []; 
@@ -193,6 +296,16 @@
         let currentPlayerIndex = 0;
         let selectedCategories = []; 
         let currentDisplayedQuestion = null;
+        let askedQuestions = new Set(); // عشان نسجل الأسئلة اللي طلعت قبل كده
+
+        // دالة اللخبطة عشان نضمن إن الأسئلة تيجي عشوائي صح
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
         function showToast(message) {
             const toast = document.getElementById("toast");
@@ -279,39 +392,37 @@
             const startBtn = document.getElementById("start-btn");
             startBtn.innerText = "جاري التحميل... ⏳";
             startBtn.disabled = true;
-
             arabicQuestions = [];
             englishQuestions = [];
-
-            // 1. إضافة الأسئلة المحلية كاحتياطي ممتاز
+            
+            // 1. إضافة الأسئلة المحلية 
             selectedCategories.forEach(cat => {
                 if(unifiedCategories[cat].localAr) arabicQuestions = arabicQuestions.concat(unifiedCategories[cat].localAr);
                 if(unifiedCategories[cat].localEn) englishQuestions = englishQuestions.concat(unifiedCategories[cat].localEn);
             });
 
-            // 2. سحب أسئلة عشوائية من النت لكل الأقسام المختارة
+            // 2. سحب أسئلة عشوائية من النت لكل الأقسام المختارة كخطة احتياطية
             for (const cat of selectedCategories) {
                 const apiId = unifiedCategories[cat].apiId;
                 if (apiId !== null) {
                     try {
-                        const response = await fetch(`https://opentdb.com/api.php?amount=15&category=${apiId}&type=multiple`);
+                        const response = await fetch(`https://opentdb.com/api.php?amount=15&category=${apiId}&difficulty=easy&type=multiple`);
                         const data = await response.json();
                         const formattedQuestions = data.results.map(item => ({
                             q: decodeHTML(item.question),
                             a: decodeHTML(item.correct_answer),
-                            isFromApi: true // علامة عشان نترجمه لما نعوز نعرضه بالعربي
+                            isFromApi: true 
                         }));
-                        // بنضيف الأسئلة للنسختين، وهتترجم وقت العرض لو اللعب بالعربي
                         englishQuestions = englishQuestions.concat(formattedQuestions);
                         arabicQuestions = arabicQuestions.concat(formattedQuestions);
                     } catch (e) { console.error("مشكلة في سحب الأسئلة:", e); }
                 }
             }
 
-            // لخبطة الأسئلة عشان متجيش بالترتيب
-            arabicQuestions = arabicQuestions.sort(() => Math.random() - 0.5);
-            englishQuestions = englishQuestions.sort(() => Math.random() - 0.5);
-
+            // لخبطة الأسئلة بخوارزمية مظبوطة
+            arabicQuestions = shuffleArray(arabicQuestions);
+            englishQuestions = shuffleArray(englishQuestions);
+            
             document.getElementById("in-game-lang").value = currentLang;
             startBtn.innerText = "تحميل وبدء اللعب 🚀";
             startBtn.disabled = false;
@@ -338,19 +449,45 @@
 
         async function loadNextQuestion() {
             let activePool = currentLang === 'ar' ? arabicQuestions : englishQuestions;
-            
-            // لو الأسئلة خلصت نرجع للنسخة الاحتياطية ونلخبطها
-            if (activePool.length === 0) {
-                showToast("الأسئلة خلصت! بنجهزلك أسئلة جديدة 🔄");
-                selectedCategories.forEach(cat => {
-                    if(currentLang === 'ar') activePool = activePool.concat(unifiedCategories[cat].localAr || []);
-                    else activePool = activePool.concat(unifiedCategories[cat].localEn || []);
-                });
-                activePool = activePool.sort(() => Math.random() - 0.5);
-                if(activePool.length === 0) return; // حماية إضافية
+            let currentQ = null;
+
+            // بنسحب سؤال، ولو اتسأل قبل كده نسحب اللي بعده
+            while (activePool.length > 0) {
+                let tempQ = activePool.pop();
+                if (!askedQuestions.has(tempQ.q)) {
+                    currentQ = tempQ;
+                    askedQuestions.add(currentQ.q);
+                    break;
+                }
             }
 
-            const currentQ = activePool.pop(); 
+            // لو الأسئلة خلصت في المصفوفة دي
+            if (!currentQ) {
+                showToast("الأسئلة خلصت! بنجهزلك أسئلة جديدة 🔄");
+                let newPool = [];
+                selectedCategories.forEach(cat => {
+                    if(currentLang === 'ar') newPool = newPool.concat(unifiedCategories[cat].localAr || []);
+                    else newPool = newPool.concat(unifiedCategories[cat].localEn || []);
+                });
+
+                // نفلتر الأسئلة عشان ناخد اللي لسه متسألش بس
+                activePool = newPool.filter(q => !askedQuestions.has(q.q));
+                
+                // لو فعلاً كل أسئلة اللعبة خلصت حرفياً
+                if(activePool.length === 0) {
+                    alert("عاش يا وحوش! كل أسئلة الأقسام دي خلصت بالكامل، اعمل ريفرش واختار أقسام تانية عشان تكمل لعب.");
+                    return; 
+                }
+
+                // نلخبط الأسئلة الجديدة ونحفظها
+                activePool = shuffleArray(activePool);
+                if(currentLang === 'ar') arabicQuestions = activePool;
+                else englishQuestions = activePool;
+
+                currentQ = activePool.pop();
+                askedQuestions.add(currentQ.q);
+            }
+
             currentDisplayedQuestion = currentQ;
             updateScoreboard();
             document.getElementById("turn-display").innerText = `🎤 الدور على: ${players[currentPlayerIndex].name}`;
@@ -358,19 +495,16 @@
             const qEl = document.getElementById("question-text");
             const aEl = document.getElementById("answer-text");
             const transBtn = document.getElementById("translate-btn");
-
-            // التعامل مع الأسئلة بناءً على اللغة المطلوبة
+            
             if (currentLang === 'ar') {
                 qEl.style.direction = "rtl"; qEl.style.textAlign = "right";
                 aEl.parentElement.style.direction = "rtl"; aEl.parentElement.style.textAlign = "right";
                 aEl.parentElement.style.borderRight = "5px solid #4caf50"; aEl.parentElement.style.borderLeft = "none";
                 transBtn.style.display = "none"; 
-
+                
                 if (currentQ.isFromApi) {
-                    // سحب سؤال من الـ API وترجمته فوراً للعربي
                     qEl.innerText = "جاري سحب سؤال عشوائي من النت وترجمته... ⏳";
                     aEl.innerHTML = `الإجابة: <span style="color:white;">...</span>`;
-                    
                     try {
                         const qRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentQ.q)}&langpair=en|ar`);
                         const qData = await qRes.json();
@@ -379,7 +513,7 @@
                         const aRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentQ.a)}&langpair=en|ar`);
                         const aData = await aRes.json();
                         const translatedA = aData.responseData.translatedText;
-
+                        
                         qEl.innerText = translatedQ;
                         aEl.innerHTML = `الإجابة: <span style="color:white;">${translatedA}</span>`;
                     } catch (e) {
@@ -387,7 +521,6 @@
                         setTimeout(skipQuestion, 2000);
                     }
                 } else {
-                    // لو السؤال عربي جاهز من القاعدة المحلية
                     qEl.innerText = currentQ.q;
                     aEl.innerHTML = `الإجابة: <span style="color:white;">${currentQ.a}</span>`;
                 }
@@ -399,7 +532,6 @@
                 transBtn.style.display = "block"; 
                 qEl.innerText = currentQ.q;
                 
-                // ترجمة تلقائية فورية زي ما كانت في الكود بتاعك
                 translateCurrent();
             }
         }
@@ -413,11 +545,14 @@
                 const qRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentDisplayedQuestion.q)}&langpair=en|ar`);
                 const qData = await qRes.json();
                 const translatedQ = qData.responseData.translatedText;
+                
                 const aRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentDisplayedQuestion.a)}&langpair=en|ar`);
                 const aData = await aRes.json();
                 const translatedA = aData.responseData.translatedText;
+                
                 const qEl = document.getElementById("question-text");
                 const aEl = document.getElementById("answer-text");
+                
                 qEl.innerText = translatedQ;
                 qEl.style.direction = "rtl"; qEl.style.textAlign = "right";
                 aEl.parentElement.style.direction = "rtl"; aEl.parentElement.style.textAlign = "right";
@@ -432,12 +567,17 @@
         function judgeAnswer(isCorrect) {
             if (isCorrect) players[currentPlayerIndex].score += 1;
             else players[currentPlayerIndex].score -= 1;
+            
             if (players[currentPlayerIndex].score >= targetScore) showWinner(players[currentPlayerIndex].name);
             else { currentPlayerIndex = (currentPlayerIndex + 1) % players.length; loadNextQuestion(); }
         }
 
         function skipQuestion() { loadNextQuestion(); }
-        function showWinner(winnerName) { switchScreen('winner-screen'); document.getElementById("winner-name").innerText = winnerName; }
-    </script>
 
-</body></html>
+        function showWinner(winnerName) { 
+            switchScreen('winner-screen'); 
+            document.getElementById("winner-name").innerText = winnerName; 
+        }
+    </script>
+</body>
+</html>
