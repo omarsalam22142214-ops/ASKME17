@@ -154,6 +154,11 @@
                 <button class="btn btn-correct" onclick="judgeAnswer(true)">صح +1 ✅</button>
             </div>
             <button class="btn btn-translate" id="translate-btn" onclick="translateCurrent()">ترجم للعربي 🌐</button>
+            
+            <select id="voice-select" style="width: 100%; margin-bottom: 10px; padding: 12px; border-radius: 10px; border: none; font-size: 1rem; background-color: #2a2752; color: white; outline: none;">
+                <option value="">جاري تحميل الأصوات...</option>
+            </select>
+            
             <button class="btn btn-full" id="speak-btn" onclick="readQuestion()" style="background-color: #9c27b0; margin-bottom: 10px; color: white;">اسمع السؤال 🔊</button>
             <button class="btn btn-skip" onclick="skipQuestion()">تخطي السؤال ⏭️</button>
         </div>
@@ -296,7 +301,60 @@
         let currentPlayerIndex = 0;
         let selectedCategories = []; 
         let currentDisplayedQuestion = null;
-        let askedQuestions = new Set(); 
+        let askedQuestions = new Set(JSON.parse(localStorage.getItem('amara17_askedQuestions')) || []); 
+        
+        // التعديل هنا: متغير عشان نخزن فيه الأصوات المتاحة
+        let availableVoices = [];
+
+        // دالة جديدة بتجيب الأصوات وتحطها في القايمة
+        function populateVoiceList() {
+            if (typeof speechSynthesis === 'undefined') return;
+            
+            availableVoices = speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById("voice-select");
+            
+            if (availableVoices.length === 0) return;
+            
+            voiceSelect.innerHTML = '';
+            
+            // بنفلتر الأصوات عشان نعرض العربي والمصري بس في الأول
+            let arabicVoices = availableVoices.filter(v => v.lang.startsWith('ar') || v.name.toLowerCase().includes('arabic') || v.name.toLowerCase().includes('egypt'));
+            
+            // لو مفيش عربي خالص، بنعرض كله عشان ما نضربش كراش
+            if (arabicVoices.length === 0) arabicVoices = availableVoices;
+
+            arabicVoices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                
+                // بندور على أسماء الأصوات اللي متسجلة في المتصفحات إنها أصوات بنات مصرية (زي Salma)
+                if (voice.name.includes('Salma') || (voice.name.toLowerCase().includes('female') && voice.lang === 'ar-EG')) {
+                    option.textContent = `👩 صوت مصري (بنت) - ${voice.name}`;
+                    option.selected = true;
+                } else if (voice.name.includes('Shakir') || voice.name.includes('Hamed') || (voice.name.toLowerCase().includes('male') && voice.lang === 'ar-EG')) {
+                    option.textContent = `👨 صوت مصري (ولد) - ${voice.name}`;
+                } else {
+                    option.textContent = `🎤 ${voice.name} (${voice.lang})`;
+                }
+                
+                // لو ملقتش صوت البنت، تختار أي صوت مصري كبديل مبدئي
+                if (!voiceSelect.querySelector('option[selected]') && voice.lang === 'ar-EG') {
+                    option.selected = true;
+                }
+                
+                voiceSelect.appendChild(option);
+            });
+            
+            if(voiceSelect.innerHTML === '') {
+                 voiceSelect.innerHTML = '<option value="">مفيش أصوات عربي متاحة على جهازك</option>';
+            }
+        }
+
+        // تشغيل الدالة لما الأصوات تحمل
+        populateVoiceList();
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -453,13 +511,30 @@
             players.forEach((player, index) => {
                 const div = document.createElement("div");
                 div.className = index === currentPlayerIndex ? "score-card active-player-card" : "score-card";
-                div.innerHTML = `${player.name} <br><span style="color:#f9a826; font-size:1.2rem;">${player.score}</span>`;
+                
+                div.innerHTML = `
+                    <div style="margin-bottom: 5px;">${player.name}</div>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                        <button onclick="adjustScore(${index}, -1)" style="background-color: #f44336; border: none; color: white; border-radius: 4px; cursor: pointer; padding: 2px 8px; font-weight: bold; font-size: 1rem;">-</button>
+                        <span style="color:#f9a826; font-size:1.2rem; font-weight: bold; min-width: 20px;">${player.score}</span>
+                        <button onclick="adjustScore(${index}, 1)" style="background-color: #4caf50; border: none; color: white; border-radius: 4px; cursor: pointer; padding: 2px 8px; font-weight: bold; font-size: 1rem;">+</button>
+                    </div>
+                `;
                 board.appendChild(div);
             });
         }
 
+        function adjustScore(index, amount) {
+            players[index].score += amount;
+            if (players[index].score >= targetScore) {
+                showWinner(players[index].name);
+            } else {
+                updateScoreboard();
+            }
+        }
+
         async function loadNextQuestion() {
-            window.speechSynthesis.cancel(); // قفل الصوت لو قلبنا السؤال
+            window.speechSynthesis.cancel(); 
             let activePool = currentLang === 'ar' ? arabicQuestions : englishQuestions;
             let currentQ = null;
 
@@ -468,6 +543,7 @@
                 if (!askedQuestions.has(tempQ.q)) {
                     currentQ = tempQ;
                     askedQuestions.add(currentQ.q);
+                    localStorage.setItem('amara17_askedQuestions', JSON.stringify([...askedQuestions]));
                     break;
                 }
             }
@@ -483,7 +559,9 @@
                 activePool = newPool.filter(q => !askedQuestions.has(q.q));
                 
                 if(activePool.length === 0) {
-                    alert("عاش يا وحوش! كل أسئلة الأقسام دي خلصت بالكامل، اعمل ريفرش واختار أقسام تانية عشان تكمل لعب.");
+                    alert("عاش يا وحوش! كل أسئلة الأقسام دي خلصت بالكامل، هنصفر الذاكرة دلوقتي عشان تقدروا تلعبوا بيهم تاني براحتكم.");
+                    localStorage.removeItem('amara17_askedQuestions');
+                    location.reload();
                     return; 
                 }
 
@@ -493,6 +571,7 @@
 
                 currentQ = activePool.pop();
                 askedQuestions.add(currentQ.q);
+                localStorage.setItem('amara17_askedQuestions', JSON.stringify([...askedQuestions]));
             }
 
             currentDisplayedQuestion = currentQ;
@@ -586,7 +665,7 @@
             document.getElementById("winner-name").innerText = winnerName; 
         }
 
-        // دالة قراءة السؤال
+        // التعديل هنا: دالة القراءة بقت بتاخد الصوت اللي انت مختاره من القايمة
         function readQuestion() {
             window.speechSynthesis.cancel();
             const qText = document.getElementById("question-text").innerText;
@@ -594,18 +673,20 @@
             if (!qText || qText.includes("Loading") || qText.includes("جاري")) return;
 
             const utterance = new SpeechSynthesisUtterance(qText);
-            const isTranslated = document.getElementById("translate-btn").style.display === "none";
             
-            if (currentLang === 'ar' || isTranslated) {
-                utterance.lang = 'ar-EG'; 
+            const selectedVoiceName = document.getElementById("voice-select").value;
+            const selectedVoice = availableVoices.find(v => v.name === selectedVoiceName);
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
             } else {
-                utterance.lang = 'en-US'; 
-            }
-
-            const voices = window.speechSynthesis.getVoices();
-            const egyptianVoice = voices.find(voice => voice.lang === 'ar-EG' || voice.name.toLowerCase().includes('egypt'));
-            if (egyptianVoice) {
-                utterance.voice = egyptianVoice;
+                // لو مفيش صوت اتحدد من القايمة، بنعتمد على الأساسي
+                const isTranslated = document.getElementById("translate-btn").style.display === "none";
+                if (currentLang === 'ar' || isTranslated) {
+                    utterance.lang = 'ar-EG'; 
+                } else {
+                    utterance.lang = 'en-US'; 
+                }
             }
 
             utterance.rate = 0.9;
