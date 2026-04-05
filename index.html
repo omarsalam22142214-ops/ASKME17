@@ -97,12 +97,15 @@
         ::-webkit-scrollbar-track { background: #121026; }
         ::-webkit-scrollbar-thumb { background: #2a2752; border-radius: 10px; }
     </style>
-<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
+<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style><style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
 <body>
     <div id="toast" class="toast-msg"></div>
     <div class="container">
         <div id="setup-screen" class="active">
             <h1>🎮 تحديات عمارة 17</h1>
+
+            <button class="btn btn-full" style="background-color: #3b82f6; color: white; margin-bottom: 20px;" onclick="window.location.href='رابط_نسخة_الاونلاين_هنا'">🌐 الدخول لمود الأونلاين</button>
+
             <p>سجل أسامي اللعيبة وظبط إعدادات الماتش!</p>
             <div class="input-group">
                 <input type="text" id="player-input" placeholder="اكتب اسم اللاعب..." data-ddg-inputtype="unknown">
@@ -301,10 +304,8 @@
         let currentDisplayedQuestion = null;
         let askedQuestions = new Set(JSON.parse(localStorage.getItem('amara17_askedQuestions')) || []); 
         
-        // التعديل هنا: متغير عشان نخزن فيه الأصوات المتاحة
         let availableVoices = [];
 
-        // دالة جديدة بتجيب الأصوات وتحطها في القايمة
         function populateVoiceList() {
             if (typeof speechSynthesis === 'undefined') return;
             
@@ -315,17 +316,14 @@
             
             voiceSelect.innerHTML = '';
             
-            // بنفلتر الأصوات عشان نعرض العربي والمصري بس في الأول
             let arabicVoices = availableVoices.filter(v => v.lang.startsWith('ar') || v.name.toLowerCase().includes('arabic') || v.name.toLowerCase().includes('egypt'));
             
-            // لو مفيش عربي خالص، بنعرض كله عشان ما نضربش كراش
             if (arabicVoices.length === 0) arabicVoices = availableVoices;
 
             arabicVoices.forEach(voice => {
                 const option = document.createElement('option');
                 option.value = voice.name;
                 
-                // بندور على أسماء الأصوات اللي متسجلة في المتصفحات إنها أصوات بنات مصرية (زي Salma)
                 if (voice.name.includes('Salma') || (voice.name.toLowerCase().includes('female') && voice.lang === 'ar-EG')) {
                     option.textContent = `👩 صوت مصري (بنت) - ${voice.name}`;
                     option.selected = true;
@@ -335,7 +333,6 @@
                     option.textContent = `🎤 ${voice.name} (${voice.lang})`;
                 }
                 
-                // لو ملقتش صوت البنت، تختار أي صوت مصري كبديل مبدئي
                 if (!voiceSelect.querySelector('option[selected]') && voice.lang === 'ar-EG') {
                     option.selected = true;
                 }
@@ -348,7 +345,6 @@
             }
         }
 
-        // تشغيل الدالة لما الأصوات تحمل
         populateVoiceList();
         if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = populateVoiceList;
@@ -663,7 +659,6 @@
             document.getElementById("winner-name").innerText = winnerName; 
         }
 
-        // التعديل هنا: دالة القراءة بقت بتاخد الصوت اللي انت مختاره من القايمة
         function readQuestion() {
             window.speechSynthesis.cancel();
             const qText = document.getElementById("question-text").innerText;
@@ -678,7 +673,6 @@
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
             } else {
-                // لو مفيش صوت اتحدد من القايمة، بنعتمد على الأساسي
                 const isTranslated = document.getElementById("translate-btn").style.display === "none";
                 if (currentLang === 'ar' || isTranslated) {
                     utterance.lang = 'ar-EG'; 
@@ -691,6 +685,4 @@
             window.speechSynthesis.speak(utterance);
         }
     </script>
-
-
 </body></html>
