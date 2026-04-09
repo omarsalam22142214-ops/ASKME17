@@ -97,7 +97,7 @@
         ::-webkit-scrollbar-track { background: #121026; }
         ::-webkit-scrollbar-thumb { background: #2a2752; border-radius: 10px; }
     </style>
-<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style><style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
+<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style><style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style><style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
 <body>
     <div id="toast" class="toast-msg"></div>
     <div class="container">
@@ -457,18 +457,67 @@
                 if(unifiedCategories[cat].localEn) englishQuestions = englishQuestions.concat(unifiedCategories[cat].localEn);
             });
 
-            try {
-                const sheetApiUrl = 'https://sheetdb.io/api/v1/fedbt2p5bnzp1'; 
-                const response = await fetch(sheetApiUrl);
-                const sheetData = await response.json();
-
-                if (sheetData && sheetData.length > 0) {
-                    arabicQuestions = arabicQuestions.concat(sheetData);
-                    showToast(`تم سحب ${sheetData.length} سؤال من جوجل شيت! 🤩`);
+            // دالة قراءة الـ CSV
+            function parseCsvRow(row) {
+                let result = [], curVal = '', inQuotes = false;
+                for (let i = 0; i < row.length; i++) {
+                    let char = row[i];
+                    if (inQuotes) {
+                        if (char === '"' && row[i + 1] === '"') { curVal += '"'; i++; }
+                        else if (char === '"') { inQuotes = false; }
+                        else { curVal += char; }
+                    } else {
+                        if (char === '"') { inQuotes = true; }
+                        else if (char === ',') { result.push(curVal.trim()); curVal = ''; }
+                        else { curVal += char; }
+                    }
                 }
+                result.push(curVal.trim());
+                return result;
+            }
+
+            try {
+                let totalFetched = 0;
+
+                // 1. سحب أسئلة الشيت القديم (SheetDB)
+                const sheetApiUrl1 = 'https://sheetdb.io/api/v1/fedbt2p5bnzp1'; 
+                try {
+                    const response1 = await fetch(sheetApiUrl1);
+                    const data1 = await response1.json();
+                    if (data1 && data1.length > 0) {
+                        arabicQuestions = arabicQuestions.concat(data1);
+                        totalFetched += data1.length;
+                    }
+                } catch(err) { console.error("مشكلة في الشيت الأول:", err); }
+
+                // 2. سحب أسئلة الشيت الجديد (Google Sheet CSV)
+                const sheet2Url = 'https://docs.google.com/spreadsheets/d/1vfBCNoVy0ON4Cy3fOl33g3qHCxYMOdMRysACYP-PISU/export?format=csv';
+                try {
+                    const response2 = await fetch(sheet2Url);
+                    const csvText = await response2.text();
+                    const rows = csvText.split('\n'); 
+                    let data2 = [];
+                    
+                    for(let i = 1; i < rows.length; i++) { 
+                        if(rows[i].trim() === '') continue; 
+                        const cols = parseCsvRow(rows[i]);
+                        if (cols.length >= 2) {
+                            data2.push({ q: cols[0], a: cols[1] });
+                        }
+                    }
+                    if (data2.length > 0) {
+                        arabicQuestions = arabicQuestions.concat(data2);
+                        totalFetched += data2.length;
+                    }
+                } catch(err) { console.error("مشكلة في الشيت التاني:", err); }
+
+                if (totalFetched > 0) {
+                    showToast(`تم سحب ${totalFetched} سؤال من الشيتات! 🤩`);
+                }
+
             } catch (e) { 
-                console.error("مشكلة في سحب أسئلة الشيت:", e); 
-                showToast("النت ضعيف، هنلعب بالأسئلة الأساسية 📶");
+                console.error("مشكلة عامة في الاتصال:", e); 
+                showToast("النت ضعيف، هنلعب بالأسئلة الأساسية 📶"); 
             }
 
             for (const cat of selectedCategories) {
